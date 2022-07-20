@@ -2,12 +2,12 @@ import PropTypes from 'prop-types';
 import { ImageGalleryItem } from './ImageGalleryItem';
 import { List } from './ImageGallery.styled';
 
-export function ImageGallery({ data, toggleModal }) {
+export function ImageGallery({ data}) {
     return (
         <List>
             {data.map(({ id, webformatURL, largeImageURL, tags, views, likes, comments, downloads }) => {
                 return (
-                    <ImageGalleryItem toggleModal={toggleModal}
+                    <ImageGalleryItem
                         img={webformatURL}
                         largeImg={largeImageURL}
                         tags={tags}

@@ -1,103 +1,68 @@
-import { PureComponent } from 'react';
+import { useState, useEffect } from 'react';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 import { Container } from './App.styled';
 import { Searchbar } from '../Searchbar';
 import { ImageGallery } from '../ImageGallery';
 import { ServiceAPI } from '../../service/Api';
 import { Loader } from '../Loader';
-import { Modals } from '../Modal';
+// import { Modals } from '../Modal';
 import { ButtonNext } from '../Button';
 import { Notify } from 'notiflix';
-import { ScrollUp } from '../ScrollUp';
-
 
 const PER_PAGE = 12;
 
-export class App extends PureComponent {
-  state = {
-    text: '',
-    images: [],
-    page: 1,
-    loader: false,
-    showModal: false,
-    modalImg: '',
-    tags: '',
-    totalHits: '',
-  };
+export function App() {
+  const [text, setText] = useState('');
+  const [images, setImages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loader, setLoader] = useState(false);
+  const [totalHits, setTotalHits] = useState('');
+  // const [showModal, setShowModal] = useState(false);
+  // const [modalImg, setModalImg] = useState('');
+  // const [tags, setTags] = useState('');
 
-  componentDidUpdate(prevProps, prevState) {
-    const { text, page } = this.state;
-    if (prevState.text !== text) {
-      this.setState({
-        page: 1,
-        images: [],
-        modalImg: '',
-        tags: '',
-        totalHits: '',
-      });
+  useEffect(() => {
+    if (text === '') {
+      return;
     }
-    if (prevState.text !== text || page !== prevState.page) {
-      this.setState({ loader: true });
-      ServiceAPI(text, page).then(data => {
-          if (data.hits.length < 1) {
-              Notify.error('Oops, we did not find anything');
-        }
-        if (data.totalHits !== 0 && data.hits.length !== 0) {
-          Notify.success(`Hooray! We found ${data.totalHits} images.`);
-        }
+    setLoader(true);
 
-        this.setState(prevState => {
-          return {
-            images: [...prevState.images, ...data.hits],
-            loader: false,
-            totalHits: data.totalHits,
-          };
-        });
-      });
-    }
+    ServiceAPI(text, page).then(data => {
+      if (data.hits.length < 1) {
+        Notify.error('Oops, we did not find anything');
+      }
+      if (data.totalHits !== 0 && data.hits.length !== 0) {
+        Notify.success(`Hooray! We found ${data.totalHits} images.`);
+      }
+      setImages(state => [...state, ...data.hits]);
+      setLoader(false);
+      setTotalHits(data.totalHits);
+    });
+  }, [text, page]);
+
+  useEffect(() => {
+    setPage(1);
+    setImages([]);
+    setTotalHits(null);
+  }, [text])
+
+  const getNextPage = () => {
+    setPage(state => state + 1);
   }
-
-  toggleModal = (img, tags) => {
-    this.setState(prev => ({
-      showModal: !prev.showModal,
-      modalImg: img,
-      tags: tags,
-    }));
-  };
-
-  onSearchText = text => {
-    this.setState(text);
-  };
-
-  getNextPage = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
-    Notify.info('Wait a minute, we are looking for images');
-  };
-
-  render() {
-    const { modalImg, showModal, tags, images, loader, totalHits, page } =
-      this.state;
-    return (
+        
+return (
       <Container>
-        {showModal &&
-          (<Modals img={modalImg} alt={tags} closeModal={this.toggleModal} tags={tags} />
-          )}
-
-        <Searchbar onSubmit={this.onSearchText} />
+        <Searchbar onSubmit={setText} />
 
         {images.length > 0 ? (
-          <ImageGallery data={images} toggleModal={this.toggleModal} />
+          <ImageGallery data={images} />
         ) : null}
 
         {loader && <Loader />}
 
         {totalHits > page * PER_PAGE && (
-          <ButtonNext getNextPage={this.getNextPage} />
+          <ButtonNext getNextPage={getNextPage} />
             )}
-             <ScrollUp smooth />
       </Container>
     );
   }
-}

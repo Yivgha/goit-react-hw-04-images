@@ -1,20 +1,25 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Image, Item, InfoWrapper, Info, Comments } from './ImageGallery.styled';
+import { Modals } from 'components/Modal';
 import { AiOutlineLike, AiOutlineEye, AiOutlineComment, AiOutlineCloudDownload } from 'react-icons/ai';
 
-export function ImageGalleryItem({ img, tags, id, largeImg, toggleModal, likes,
-    views, comments, downloads}) {
+export function ImageGalleryItem({ img, tags, id, largeImg, likes,
+  views, comments, downloads }) {
+  const [isShowModal, setIsShowModal] = useState(false);
  
     return (
-        <Item key={`${id}`} onClick={() => toggleModal(largeImg, tags)}>
-            <Image src={`${img}`} alt={`${tags}`} loading="lazy" />
-            <InfoWrapper>
-          <Info>
-            <b>
-              <AiOutlineLike size={24} color="#3f51b5" />
-            </b>
-            <Comments> {`${likes}`}</Comments>
-          </Info>
+        <Item key={`${id}`} onClick={() => setIsShowModal(true)}>
+        <Image src={img} alt={tags} loading="lazy" />
+        {isShowModal && <Modals img={largeImg} tags={tags} onClose={() => setIsShowModal(false)}>
+        </Modals>}
+        <InfoWrapper>
+            <Info>
+              <b>
+                <AiOutlineLike size={24} color="#3f51b5" />
+              </b>
+              <Comments> {`${likes}`}</Comments>
+            </Info>
           <Info>
             <b>
               <AiOutlineEye size={24} color="#3f51b5" />
@@ -34,7 +39,7 @@ export function ImageGalleryItem({ img, tags, id, largeImg, toggleModal, likes,
             <Comments>{`${downloads}`}</Comments>
           </Info>
         </InfoWrapper>
-        </Item>
+      </Item>
     );
 };
 
@@ -43,7 +48,6 @@ ImageGalleryItem.propTypes = {
     tags: PropTypes.string.isRequired,
     id: PropTypes.number.isRequired,
     largeImg: PropTypes.string.isRequired,
-    toggleModal: PropTypes.func.isRequired,
     likes: PropTypes.number.isRequired,
   views: PropTypes.number.isRequired,
   comments: PropTypes.number.isRequired,

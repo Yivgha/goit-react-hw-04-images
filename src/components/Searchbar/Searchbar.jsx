@@ -1,4 +1,4 @@
-import { PureComponent } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Header,
@@ -9,41 +9,35 @@ import {
 import { BsSearch } from 'react-icons/bs';
 import { Notify } from 'notiflix';
 
-export class Searchbar extends PureComponent {
-    state = { text: '' };
-
-    onSubmitForm = e => {
+export function Searchbar({ onSubmit }) {
+    const [text, setText] = useState('');
+    
+    const onSubmitForm = e => {
         e.preventDefault();
-        if (this.state.text.trim() === '') {
+        if (text.trim() === '') {
             Notify.info('Write something');
             return;
         }
-
-        const onSubmit = this.props.onSubmit;
-
-        const state = this.state;
-        onSubmit(state);
-        this.setState({ text: '' });
+        onSubmit(text);
+        setText('');
     };
 
-      handelInputChange = e => {
+    const handelInputChange = e => {
     const text = e.currentTarget.value.toLowerCase();
-    this.setState({ text });
+    setText(text);
     };
     
-    render() {
-        return (
+    return (
             <Header>
-                <SearchForm onSubmit={this.onSubmitForm}>
+                <SearchForm onSubmit={onSubmitForm}>
                     <SearchFormButton type="submit">
                         <BsSearch />
                     </SearchFormButton>
-                    <InputSearch type="text" placeholder="Search images and photos" value={this.state.text} onChange={this.handelInputChange} />
+                    <InputSearch type="text" placeholder="Search images and photos" value={text} onChange={handelInputChange} />
                 </SearchForm>
             </Header>
         );
-    };
-}
+};
 
 Searchbar.propTypes = {
     onSubmit: PropTypes.func.isRequired,
