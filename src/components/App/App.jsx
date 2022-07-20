@@ -5,7 +5,6 @@ import { Searchbar } from '../Searchbar';
 import { ImageGallery } from '../ImageGallery';
 import { ServiceAPI } from '../../service/Api';
 import { Loader } from '../Loader';
-// import { Modals } from '../Modal';
 import { ButtonNext } from '../Button';
 import { Notify } from 'notiflix';
 
@@ -17,9 +16,6 @@ export function App() {
   const [page, setPage] = useState(1);
   const [loader, setLoader] = useState(false);
   const [totalHits, setTotalHits] = useState('');
-  // const [showModal, setShowModal] = useState(false);
-  // const [modalImg, setModalImg] = useState('');
-  // const [tags, setTags] = useState('');
 
   useEffect(() => {
     if (text === '') {

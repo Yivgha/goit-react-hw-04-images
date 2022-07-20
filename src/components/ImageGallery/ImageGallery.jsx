@@ -26,5 +26,4 @@ export function ImageGallery({ data}) {
 
 ImageGallery.propTypes = {
     data: PropTypes.array.isRequired,
-    toggleModal: PropTypes.func.isRequired,
 };
