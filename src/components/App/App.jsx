@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 import { Container } from './App.styled';
 import { Searchbar } from '../Searchbar';
-import { ImageGallery } from '../ImageGallery';
+import { ImageGallery } from '../ImageGallery/ImageGallery';
 import { ServiceAPI } from '../../service/Api';
 import { Loader } from '../Loader';
 import { ButtonNext } from '../Button';
-import { Notify } from 'notiflix';
 
 const PER_PAGE = 12;
 
@@ -25,40 +24,33 @@ export function App() {
 
     ServiceAPI(text, page).then(data => {
       if (data.hits.length < 1) {
-        Notify.error('Oops, we did not find anything');
+        alert('opps, ничего не найдено!');
       }
-      if (data.totalHits !== 0 && data.hits.length !== 0) {
-        Notify.success(`Hooray! We found ${data.totalHits} images.`);
-      }
+
       setImages(state => [...state, ...data.hits]);
       setLoader(false);
       setTotalHits(data.totalHits);
     });
-  }, [text, page]);
+  }, [page, text]);
 
-  useEffect(() => {
+    useEffect(() => {
     setPage(1);
     setImages([]);
     setTotalHits(null);
-  }, [text])
+  }, [text]);
 
   const getNextPage = () => {
     setPage(state => state + 1);
-  }
-        
-return (
-      <Container>
-        <Searchbar onSubmit={setText} />
+  };
 
-        {images.length > 0 ? (
-          <ImageGallery data={images} />
-        ) : null}
+  return (
+    <Container>
+      <Searchbar onSubmit={setText} />
 
-        {loader && <Loader />}
+      {images.length > 0 ? <ImageGallery data={images} /> : null}
 
-        {totalHits > page * PER_PAGE && (
-          <ButtonNext getNextPage={getNextPage} />
-            )}
-      </Container>
-    );
-  }
+      {loader && <Loader />}
+      {totalHits > page * PER_PAGE && <ButtonNext getNextPage={getNextPage} />}
+    </Container>
+  );
+}
