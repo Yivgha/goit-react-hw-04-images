@@ -1,18 +1,14 @@
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Overlay, Modal } from './Modal.styled';
-import { createPortal } from 'react-dom';
+import { Overlay, Modal, Description } from './Modal.styled';
 
-const modalRoot = document.querySelector('#modal-root');
-
-export function Modals({ img, tags, onClose }) {
+export function Modals({img, tags, onClose}) {
   useEffect(() => {
     const closeModal = e => {
       if (e.code === 'Escape') {
         onClose();
       }
     };
-
     window.addEventListener('keydown', closeModal);
     document.body.style.overflow = 'hidden';
 
@@ -22,12 +18,12 @@ export function Modals({ img, tags, onClose }) {
     };
   }, [onClose]);
 
-  return createPortal(
-    <Overlay onClick={onClose}>
-      <Modal src={`${img}`} alt={`${tags}`} />
-    </Overlay>,
-    modalRoot
-  );
+    return (
+      <Overlay onClick={onClose}>
+        <Modal src={`${img}`} alt={`${tags}`} />
+        <Description>{`${tags}`}</Description>
+      </Overlay>
+    );
 }
 
 Modals.propTypes = {

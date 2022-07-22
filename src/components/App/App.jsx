@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 import { Container } from './App.styled';
 import { Searchbar } from '../Searchbar';
-import { ImageGallery } from '../ImageGallery/ImageGallery';
+import { ImageGallery } from '../ImageGallery';
 import { ServiceAPI } from '../../service/Api';
 import { Loader } from '../Loader';
 import { ButtonNext } from '../Button';
+import { Notify } from 'notiflix';
 
 const PER_PAGE = 12;
 
@@ -16,24 +17,26 @@ export function App() {
   const [loader, setLoader] = useState(false);
   const [totalHits, setTotalHits] = useState('');
 
-  useEffect(() => {
+   useEffect(() => {
     if (text === '') {
       return;
     }
-    setLoader(true);
+     setLoader(true);
 
     ServiceAPI(text, page).then(data => {
       if (data.hits.length < 1) {
-        alert('opps, ничего не найдено!');
+        Notify.error('Oops, we did not find anything');
       }
-
+      if (data.totalHits !== 0 && data.hits.length !== 0) {
+          Notify.success(`Hooray! We found ${data.totalHits} images.`);
+        }
       setImages(state => [...state, ...data.hits]);
       setLoader(false);
       setTotalHits(data.totalHits);
     });
   }, [page, text]);
 
-    useEffect(() => {
+   useEffect(() => {
     setPage(1);
     setImages([]);
     setTotalHits(null);
@@ -41,16 +44,22 @@ export function App() {
 
   const getNextPage = () => {
     setPage(state => state + 1);
+    Notify.info('Wait a minute, we are looking for images');
   };
+ 
+    return (
+      <Container>
+        <Searchbar onSubmit={setText} />
 
-  return (
-    <Container>
-      <Searchbar onSubmit={setText} />
+        {images.length > 0 ? (
+          <ImageGallery data={images} />
+        ) : null}
 
-      {images.length > 0 ? <ImageGallery data={images} /> : null}
+        {loader && <Loader />}
 
-      {loader && <Loader />}
-      {totalHits > page * PER_PAGE && <ButtonNext getNextPage={getNextPage} />}
-    </Container>
-  );
-}
+        {totalHits > page * PER_PAGE && (
+          <ButtonNext getNextPage={getNextPage} />
+            )}
+      </Container>
+    );
+  }
